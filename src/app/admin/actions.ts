@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { db } from "@/db";
+import { db, isDatabaseConfigured } from "@/db";
 import { orders, products, reviews, type ColorOption, type SpecItem } from "@/db/schema";
 import { ADMIN_PASSWORD, clearAdminSession, isAdmin, setAdminSession } from "@/lib/admin-auth";
 import { and, eq, ne, sql } from "drizzle-orm";
@@ -25,6 +25,13 @@ async function guard(): Promise<void> {
   }
 }
 
+/** Writes are impossible without a database: fail with a readable message. */
+function requireDatabase(): void {
+  if (!isDatabaseConfigured()) {
+    redirect("/admin/products?error=db");
+  }
+}
+
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const password = String(formData.get("password") ?? "");
   if (password !== ADMIN_PASSWORD) {
@@ -41,6 +48,7 @@ export async function logoutAction(): Promise<void> {
 
 export async function saveProductAction(formData: FormData): Promise<void> {
   await guard();
+  requireDatabase();
   await ensureSeeded();
 
   const idRaw = String(formData.get("id") ?? "");
@@ -129,9 +137,14 @@ export async function saveProductAction(formData: FormData): Promise<void> {
 
 export async function deleteProductAction(formData: FormData): Promise<void> {
   await guard();
+  requireDatabase();
   const id = Number(formData.get("id"));
   if (Number.isFinite(id) && id > 0) {
-    await db.delete(products).where(eq(products.id, id));
+    try {
+      await db.delete(products).where(eq(products.id, id));
+    } catch {
+      redirect("/admin/products?error=delete");
+    }
   }
   revalidatePath("/admin/products");
   revalidatePath("/shop");
@@ -140,11 +153,16 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
 
 export async function updateOrderStatusAction(formData: FormData): Promise<void> {
   await guard();
+  requireDatabase();
   const id = Number(formData.get("id"));
   const status = String(formData.get("status") ?? "new");
   const allowed = ["new", "confirmed", "shipped", "delivered", "cancelled"];
   if (Number.isFinite(id) && id > 0 && allowed.includes(status)) {
-    await db.update(orders).set({ status }).where(eq(orders.id, id));
+    try {
+      await db.update(orders).set({ status }).where(eq(orders.id, id));
+    } catch {
+      redirect("/admin/orders?error=update");
+    }
   }
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
@@ -152,19 +170,24 @@ export async function updateOrderStatusAction(formData: FormData): Promise<void>
 
 export async function setReviewStatusAction(formData: FormData): Promise<void> {
   await guard();
+  requireDatabase();
   const id = Number(formData.get("id"));
   const status = String(formData.get("status") ?? "approved");
   if (Number.isFinite(id) && id > 0 && ["approved", "pending", "hidden"].includes(status)) {
-    const [review] = await db.update(reviews).set({ status }).where(eq(reviews.id, id)).returning();
-    if (review) {
-      const [aggregate] = await db
-        .select({ average: sql<string>`coalesce(avg(${reviews.rating}), 5)`, count: sql<number>`count(*)::int` })
-        .from(reviews)
-        .where(and(eq(reviews.productId, review.productId), eq(reviews.status, "approved")));
-      await db
-        .update(products)
-        .set({ rating: Number(aggregate?.average ?? 5).toFixed(2), reviewCount: aggregate?.count ?? 0 })
-        .where(eq(products.id, review.productId));
+    try {
+      const [review] = await db.update(reviews).set({ status }).where(eq(reviews.id, id)).returning();
+      if (review) {
+        const [aggregate] = await db
+          .select({ average: sql<string>`coalesce(avg(${reviews.rating}), 5)`, count: sql<number>`count(*)::int` })
+          .from(reviews)
+          .where(and(eq(reviews.productId, review.productId), eq(reviews.status, "approved")));
+        await db
+          .update(products)
+          .set({ rating: Number(aggregate?.average ?? 5).toFixed(2), reviewCount: aggregate?.count ?? 0 })
+          .where(eq(products.id, review.productId));
+      }
+    } catch {
+      redirect("/admin/reviews?error=update");
     }
   }
   revalidatePath("/admin/reviews");
@@ -172,9 +195,14 @@ export async function setReviewStatusAction(formData: FormData): Promise<void> {
 
 export async function deleteReviewAction(formData: FormData): Promise<void> {
   await guard();
+  requireDatabase();
   const id = Number(formData.get("id"));
   if (Number.isFinite(id) && id > 0) {
-    await db.delete(reviews).where(eq(reviews.id, id));
+    try {
+      await db.delete(reviews).where(eq(reviews.id, id));
+    } catch {
+      redirect("/admin/reviews?error=delete");
+    }
   }
   revalidatePath("/admin/reviews");
 }
