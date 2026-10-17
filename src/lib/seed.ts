@@ -1,4 +1,5 @@
-import { db } from "@/db";
+import { db, isDatabaseConfigured } from "@/db";
+import { ensureSchema } from "@/db/bootstrap";
 import { brands, categories, orders, products, reviews, type OrderItem } from "@/db/schema";
 import { buildReviewTemplates, seedBrands, seedCategories, seedProducts } from "@/lib/catalog-data";
 import { shippingFor } from "@/lib/site";
@@ -202,12 +203,28 @@ async function seedCatalog() {
   );
 }
 
-export async function ensureSeeded(): Promise<void> {
+/**
+ * Creates the schema when needed and fills the catalog with the demo data.
+ *
+ * Returns false when no database is configured: the build must never depend on
+ * a reachable database, and the storefront simply renders empty until
+ * DATABASE_URL is provided.
+ */
+export async function ensureSeeded(): Promise<boolean> {
+  if (!isDatabaseConfigured()) {
+    return false;
+  }
+
   if (!seedPromise) {
-    seedPromise = runSeed().catch((error) => {
+    seedPromise = (async () => {
+      await ensureSchema();
+      await runSeed();
+    })().catch((error) => {
       seedPromise = null;
       throw error;
     });
   }
-  return seedPromise;
+
+  await seedPromise;
+  return true;
 }

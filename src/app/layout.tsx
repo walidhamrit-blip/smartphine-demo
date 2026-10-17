@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartDrawer } from "@/components/cart-drawer";
 import { WhatsAppFab } from "@/components/whatsapp-fab";
+import { DatabaseBanner } from "@/components/database-banner";
 import { getServerLang } from "@/lib/lang-server";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body className="min-h-screen bg-page text-ink antialiased">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <SiteProvider initialLang={lang}>
+          <DatabaseBanner lang={lang} />
           <SiteHeader />
           <main className="min-h-[60vh]">{children}</main>
           <SiteFooter />

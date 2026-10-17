@@ -7,6 +7,11 @@ export const LANGS: { code: Lang; label: string; short: string }[] = [
 
 export const dict = {
   "brand.tagline": { en: "Technology, curated in Tripoli", ar: "التقنية، باختيار طرابلسي" },
+  "db.banner.title": { en: "Database not connected", ar: "قاعدة البيانات غير متصلة" },
+  "db.banner.body": {
+    en: "Add the DATABASE_URL environment variable to load the catalog — the site stays online in the meantime.",
+    ar: "أضف متغير البيئة DATABASE_URL لعرض المنتجات — الموقع يعمل مؤقتاً بدونها.",
+  },
   "common.addToCart": { en: "Add to cart", ar: "أضف إلى السلة" },
   "common.added": { en: "Added", ar: "تمت الإضافة" },
   "common.buyNow": { en: "Buy now", ar: "اشترِ الآن" },
