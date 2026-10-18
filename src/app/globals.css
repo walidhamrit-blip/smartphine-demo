@@ -277,11 +277,11 @@ select.field {
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee-left 44s linear infinite;
+  animation: marquee-left 64s linear infinite;
   will-change: transform;
 }
 .marquee-track.reverse {
-  animation: marquee-right 50s linear infinite;
+  animation: marquee-right 72s linear infinite;
 }
 .marquee-viewport:hover .marquee-track {
   animation-play-state: paused;

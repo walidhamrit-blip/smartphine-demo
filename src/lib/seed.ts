@@ -116,7 +116,18 @@ async function seedDemoOrders() {
   }
 }
 
+/**
+ * Brands are inserted on every boot (`onConflictDoNothing`), independently from
+ * the rest of the catalogue: adding a partner to `seedBrands` must show up in
+ * the home ribbon of an already provisioned database, without touching the
+ * existing products, reviews or orders.
+ */
+async function seedBrandsAlways() {
+  await db.insert(brands).values(seedBrands).onConflictDoNothing();
+}
+
 async function runSeed() {
+  await seedBrandsAlways();
   const existing = await db.select({ count: sql<number>`count(*)::int` }).from(products);
   if ((existing[0]?.count ?? 0) === 0) {
     await seedCatalog();
@@ -127,7 +138,7 @@ async function runSeed() {
 async function seedCatalog() {
 
   await db.insert(categories).values(seedCategories).onConflictDoNothing();
-  await db.insert(brands).values(seedBrands).onConflictDoNothing();
+  await seedBrandsAlways();
 
   const inserted = await db
     .insert(products)

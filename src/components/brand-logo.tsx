@@ -21,8 +21,8 @@ type Props = {
   name: string;
   monogram?: string | null;
   accent?: string | null;
-  /** Optical height of the mark, in px. Defaults to 26 (ribbon size). */
-  height?: number;
+  /** Optical height of the mark: a px number or any CSS length (`clamp()`, var…). */
+  height?: number | string;
   /** Force the brand's own colour instead of inheriting `currentColor`. */
   colored?: boolean;
   className?: string;
