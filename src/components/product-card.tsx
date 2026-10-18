@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSite } from "@/components/site-provider";
+import { BrandLine } from "@/components/brand-name";
 import { IconCart, IconCheck, IconPlus, Stars } from "@/components/ui";
 import type { ProductView } from "@/lib/store";
 
@@ -81,7 +82,7 @@ export function ProductCard({ product, priority = false }: { product: ProductVie
 
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">{product.brandSlug}</span>
+          <BrandLine slug={product.brandSlug} muted />
           <span className="flex items-center gap-1 text-[11px] text-muted">
             <Stars rating={product.rating} size="text-[11px]" />
             <span className="tabular-nums">({product.reviewCount})</span>

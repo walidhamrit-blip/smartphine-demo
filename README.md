@@ -67,6 +67,42 @@ soon as the variable is set.
 
 > The first request after the redeploy creates the tables and seeds the demo data.
 
+## Brand logos
+
+The partner ribbons on the home page show the real brand marks, not text monograms.
+
+| File | Role |
+| --- | --- |
+| `src/lib/brand-logos.ts` | 24x24 SVG paths + official colour of each brand |
+| `src/components/brand-logo.tsx` | `<BrandLogo>` renderer, with monogram fallback |
+| `src/components/brand-name.tsx` | `<BrandLine>`: logo + properly cased brand name |
+
+Apple, Samsung, Xiaomi, HONOR, JBL, Sony, OPPO, Huawei, OnePlus, Nokia, Motorola,
+vivo and Bose use the official single-colour artwork from
+[Simple Icons](https://simpleicons.org) (CC0), recoloured with the brand accent
+stored in the `brands` table. realme, itel, Beats, Infinix, TECNO, Anker, Spigen,
+Baseus, soundcore and SanDisk are not in that dataset, so they ship with a locally
+drawn, brand-coloured mark — replace the `paths` entry in `src/lib/brand-logos.ts`
+with the official artwork as soon as you have it.
+
+Everything is inlined as SVG: no image request, no missing asset, and a brand added
+through `/admin` simply falls back to its monogram badge. On the dark theme the
+marks are inverted to the current text colour, because brand colours such as
+`#111114` would disappear on `--surface`.
+
+The same logos are reused in the shop brand filters, on the product cards and on the
+product pages, where the raw `brand_slug` used to be printed.
+
+Ribbon sizing: logos are `clamp(32px, 3.2vw, 42px)` tall (`--brand-logo-h`) and each
+row repeats its group of brands until it overflows the viewport, so a short brand
+list never scrolls past an empty gap. The two halves of a track stay identical, which
+is what keeps the `-50%` CSS translation seamless.
+
+Adding a partner: append it to `seedBrands` in `src/lib/catalog-data.ts` and to
+`brandLogos`. Brands are re-inserted on every boot (`onConflictDoNothing`), so a new
+partner shows up on an already provisioned database without a migration; products,
+reviews and orders are left untouched.
+
 ## Troubleshooting
 
 **`Error: DATABASE_URL is required` during the build**
@@ -80,7 +116,8 @@ while the variable is missing.
 
 The database is configured but unreachable or empty. `GET /api/health` returns the
 reason (`DATABASE_URL is not configured`, connection error, …) and the server logs
-print the failing query.
+print the failing query. The brand ribbon is the only section that stays populated:
+it falls back to the seeded list of partner logos.
 
 **`relation "products" does not exist`**
 

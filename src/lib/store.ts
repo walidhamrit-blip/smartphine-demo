@@ -15,6 +15,7 @@ import {
   type SpecItem,
 } from "@/db/schema";
 import { ensureSeeded } from "@/lib/seed";
+import { seedBrands } from "@/lib/catalog-data";
 import { and, asc, desc, eq, gte, ilike, lte, ne, or, sql } from "drizzle-orm";
 
 /**
@@ -160,11 +161,25 @@ export async function getCategories(): Promise<Category[]> {
   }, []);
 }
 
+/**
+ * The brand ribbon is pure branding: it should still show the partner logos
+ * when the database is missing or unreachable, so it falls back to the seeded
+ * list instead of rendering nothing. Products and orders never do this.
+ */
+const brandFallback: Brand[] = seedBrands.map((brand, index) => ({
+  id: index + 1,
+  slug: brand.slug,
+  name: brand.name,
+  monogram: brand.monogram,
+  accent: brand.accent,
+  sortOrder: brand.sortOrder,
+}));
+
 export async function getBrands(): Promise<Brand[]> {
   return safe("getBrands", async () => {
     await ensureSeeded();
     return db.select().from(brands).orderBy(asc(brands.sortOrder));
-  }, []);
+  }, brandFallback);
 }
 
 function orderClause(sort: SortKey | undefined) {

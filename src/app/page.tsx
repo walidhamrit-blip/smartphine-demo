@@ -35,7 +35,12 @@ export default async function HomePage() {
     getTestimonials(3),
   ]);
 
-  const marqueeBrands = brands.map((brand) => ({ name: brand.name, accent: brand.accent, monogram: brand.monogram }));
+  const marqueeBrands = brands.map((brand) => ({
+    slug: brand.slug,
+    name: brand.name,
+    accent: brand.accent,
+    monogram: brand.monogram,
+  }));
 
   return (
     <>

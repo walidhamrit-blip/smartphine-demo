@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { BrandLine } from "@/components/brand-name";
 import { useSite } from "@/components/site-provider";
 import {
   IconArrow,
@@ -145,7 +146,7 @@ export function ProductPurchase({ product }: { product: ProductView }) {
     <div>
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
         <Link href={`/shop?brand=${product.brandSlug}`} className="transition hover:text-gold">
-          {product.brandSlug}
+          <BrandLine slug={product.brandSlug} muted />
         </Link>
         <span>·</span>
         <Link href={`/shop?category=${product.categorySlug}`} className="transition hover:text-gold">
