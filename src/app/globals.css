@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&family=Cairo:wght@300;400;500;600;700;800&display=swap");
+/* Fonts are loaded from <link> tags in the root layout: a CSS @import here is
+   discovered late and serially, which blocked first render on slow networks. */
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));

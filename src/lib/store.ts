@@ -254,14 +254,28 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductView[]> {
 export async function getDealProducts(limit = 4): Promise<ProductView[]> {
   return safe("getDealProducts", async () => {
     await ensureSeeded();
+    // Best discount first: 1 - price / compareAtPrice (0 when there is no anchor price).
+    const discount = sql`coalesce(1 - ${products.price} / nullif(${products.compareAtPrice}, 0), 0)`;
     const rows = await db
       .select()
       .from(products)
       .where(eq(products.deal, true))
-      .orderBy(desc(products.rating))
+      .orderBy(desc(discount), desc(products.rating))
       .limit(limit);
     return rows.map(toProductView);
   }, []);
+}
+
+/** Product count per category slug, computed in Postgres instead of in memory. */
+export async function getCategoryCounts(): Promise<Record<string, number>> {
+  return safe("getCategoryCounts", async () => {
+    await ensureSeeded();
+    const rows = await db
+      .select({ slug: products.categorySlug, count: sql<number>`count(*)::int` })
+      .from(products)
+      .groupBy(products.categorySlug);
+    return Object.fromEntries(rows.map((row) => [row.slug, row.count]));
+  }, {});
 }
 
 export async function getNewProducts(limit = 4): Promise<ProductView[]> {

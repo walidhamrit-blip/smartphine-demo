@@ -39,6 +39,17 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
+      <head>
+        {/* Preconnect + a single stylesheet request: much faster than the CSS
+            @import waterfall, and the variable fonts cover every weight used. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- root layout of the App Router: loads site-wide, not for a single page */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@300..800&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300..800&display=swap"
+        />
+      </head>
       <body className="min-h-screen bg-page text-ink antialiased">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <SiteProvider initialLang={lang}>
