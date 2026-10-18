@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useSite } from "@/components/site-provider";
+import { BrandLogo } from "@/components/brand-logo";
 import { IconClose, IconFilter, IconSliders, IconWhatsApp } from "@/components/ui";
 import type { DictKey } from "@/lib/i18n";
 import type { Brand, Category } from "@/db/schema";
@@ -93,6 +94,14 @@ export function ShopShell({ categories, brands, total, children }: Props) {
               onClick={() => update({ brand: brand === item.slug ? null : item.slug })}
               className={`chip ${brand === item.slug ? "chip-active" : ""}`}
             >
+              <BrandLogo
+                slug={item.slug}
+                name={item.name}
+                monogram={item.monogram}
+                accent={item.accent}
+                height={14}
+                colored={brand !== item.slug}
+              />
               {item.name}
             </button>
           ))}

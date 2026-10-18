@@ -286,6 +286,12 @@ select.field {
 .marquee-viewport:hover .marquee-track {
   animation-play-state: paused;
 }
+/* Brand logos are shipped in their own (often very dark) colours, which would
+   disappear on the dark theme. Invert them to the current text colour there. */
+.dark .marquee-track svg[role="img"],
+.dark .chip svg[role="img"] {
+  color: currentColor !important;
+}
 
 /* ---------- entrance ---------- */
 @keyframes fade-up {
