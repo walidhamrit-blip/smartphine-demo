@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useSite } from "@/components/site-provider";
 import { IconArrow, IconCheck, IconInstagram, IconMapPin, IconWhatsApp } from "@/components/ui";
@@ -149,6 +150,36 @@ export function SiteFooter() {
               {t("nav.admin")}
             </Link>
           </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          {/* Official credit from https://nokhba.net.ly/badge, served locally. */}
+          <a
+            href="https://nokhba.net.ly/?utm_source=client_footer&utm_medium=badge&utm_campaign=client_credit"
+            target="_blank"
+            rel="sponsored nofollow noopener noreferrer"
+            title="Website by Nukhba"
+            className="inline-flex rounded-full opacity-90 transition hover:-translate-y-0.5 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transform-none motion-reduce:transition-none"
+          >
+            <Image
+              src="/badge/nukhba-badge.svg"
+              alt="نخبة | Website by Nukhba"
+              width={176}
+              height={44}
+              loading="lazy"
+              unoptimized
+              className="h-11 w-44 dark:hidden"
+            />
+            <Image
+              src="/badge/nukhba-badge-light.svg"
+              alt="نخبة | Website by Nukhba"
+              width={176}
+              height={44}
+              loading="lazy"
+              unoptimized
+              className="hidden h-11 w-44 dark:block"
+            />
+          </a>
         </div>
       </div>
       <div className="select-none overflow-hidden border-t border-line">
